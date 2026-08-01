@@ -1,172 +1,146 @@
 # ITER Pharmaceuticals Medical Representative Platform
 
-A comprehensive field-operations platform for pharmaceutical medical representatives, managers, and administrators. Built with React, Express.js, PostgreSQL/Prisma, and Docker.
+A full-stack field operations platform for pharmaceutical medical representatives, managers, and administrators. It combines role-based workflows for doctors, visits, orders, samples, reporting, notifications, and audit tracking in one system.
 
-## Features (All 13 Epics Implemented)
+## Overview
 
-### Epic 1: Authentication & User Management
-- JWT-based login/registration with password strength validation
-- OTP-based forgot/reset password flow
-- Role-based access control (Admin, Manager, Medical Representative)
-- Session management with secure token handling
-- Audit logging for all auth events
+This project provides a modern digital workflow for pharmaceutical sales operations, including:
 
-### Epic 2: Doctor Management
-- Full CRUD operations with edit/delete confirmation dialogs
-- Search by name, filter by city and specialty
-- Doctor detail view with visit history, orders, and samples
-- GPS coordinates and geofence radius configuration
+- secure authentication and role-based access control
+- doctor and territory management
+- visit tracking with GPS-based check-in/check-out workflows
+- order and sample handling
+- manager analytics and operational reporting
+- monitoring, containerization, and infrastructure automation
 
-### Epic 3: Territory Management
-- Territory CRUD with region and coverage target management
-- MR assignment and removal
-- Territory dashboard with coverage %, doctors covered, pending visits
-- Territory analytics in manager dashboard
+## Key capabilities
 
-### Epic 4: Visit Management (eDCR)
-- Visit creation with doctor dropdown selector
-- GPS check-in/check-out with geofence verification
-- Visit notes, products discussed, doctor feedback, consent capture
-- Daily/weekly filtering and visit duration tracking
-- Edit visit capability
+- Authentication and user management with JWT-based sessions
+- Doctor management with search, filters, and relationship context
+- Territory management with coverage and assignment workflows
+- Visit management for eDCR-style execution and tracking
+- Order and sample workflows with stock and status handling
+- Dashboard analytics for operations and performance visibility
+- Notifications, reports, and audit logging
 
-### Epic 5: Order Management
-- Order creation with doctor and product dropdown selectors
-- Order editing (quantity/status) and cancellation with reason
-- Electronic signature capture
-- Order detail view with full information
-- Status filtering (pending, confirmed, cancelled)
-
-### Epic 6: Sample Management
-- Transactional sample issuance with stock validation
-- Batch number and expiry date tracking
-- Doctor and product dropdown selectors
-- Low stock alerts and inventory snapshot
-- Reissue capability
-
-### Epic 7: Medicine Management
-- Full CRUD with search and category filter
-- Image URL support with preview
-- Stock and pricing management
-- Role-based create/edit/delete permissions
-
-### Epic 8: Manager Dashboard & Analytics
-- Real-time operational metrics (visits, orders, samples, stock)
-- MR performance ranking with top/lowest performer labels
-- Territory analytics with coverage calculation
-- Sales analytics with revenue calculation
-- System statistics panel
-- Audit trail viewer
-
-### Epic 9: Notifications
-- Multi-channel notification queue (email, SMS, push)
-- Notification creation, status management, and deletion
-- Email delivery integration seam (Nodemailer)
-- Test notification delivery endpoint
-- Rep-scoped notification viewing
-
-### Epic 10: Reports
-- Period-filtered reports (daily/weekly/monthly with actual date ranges)
-- CSV export per period
-- PDF report generation via PDFKit
-- Operational trend visualization
-
-### Epic 11: Admin Panel
-- User CRUD with role management
-- Edit and delete with confirmation dialogs
-- User search and filtering
-- System statistics overview
-
-### Epic 12: Cloud & DevOps
-- Docker Compose with PostgreSQL, backend, frontend, Prometheus, Grafana
-- Kubernetes deployment manifests with HPA
-- Terraform infrastructure-as-code (KMS, S3, CloudWatch)
-- GitHub Actions CI/CD with CodeQL security scanning
-- Prometheus metrics endpoint and Grafana dashboard
-
-### Epic 13: Security & Compliance
-- Password hashing with bcrypt
-- JWT validation with role-based middleware
-- Helmet security headers
-- Rate limiting on authentication endpoints
-- Comprehensive audit logging with IP tracking
-- Input validation across all endpoints
-- Centralized error handling
-
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
-|-------|------------|
-| Frontend | React 18, TypeScript, Vite, React Router |
-| Backend | Express.js, TypeScript, Prisma ORM |
-| Database | PostgreSQL 16 |
-| Auth | JWT, bcrypt |
-| Reports | PDFKit (PDF), CSV export |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, React Router |
+| Backend | Node.js, Express, TypeScript, Prisma ORM |
+| Database | PostgreSQL |
+| Security | JWT, bcrypt, Helmet, rate limiting |
+| Reporting | PDF generation and CSV export support |
 | Monitoring | Prometheus, Grafana |
-| DevOps | Docker, Kubernetes, Terraform, GitHub Actions |
+| DevOps | Docker Compose, Kubernetes manifests, Terraform |
 
-## Local Development
+## Repository structure
+
+```text
+backend/       # Express + Prisma API
+frontend/      # React + Vite UI
+k8s/           # Kubernetes deployment manifests
+monitoring/    # Prometheus and Grafana configuration
+terraform/     # Infrastructure-as-code templates
+```
+
+## Quick start
 
 ### Prerequisites
+
 - Node.js 20+
-- PostgreSQL 16+ (or Docker)
+- Docker Desktop (recommended for the full stack)
+- PostgreSQL 16+ if you plan to run services locally without Docker
 
-### Quick Start
+### Option 1: Docker Compose (recommended)
 
-1. Clone the repository and install dependencies:
+1. Clone the repository
+2. Create the backend environment file:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+3. Start the full stack:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+- frontend: http://localhost:3000
+- backend API: http://localhost:5000
+- PostgreSQL: localhost:5432
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3001
+
+### Option 2: Local development
+
+1. Install dependencies:
+
 ```bash
 cd backend && npm install
 cd ../frontend && npm install
 ```
 
-2. Configure environment:
-```bash
-cp backend/.env.example backend/.env
-# Edit backend/.env with your DATABASE_URL and JWT_SECRET
-```
+2. Configure environment variables in backend/.env.
 
-3. Initialize database:
+3. Apply database migrations and seed initial data:
+
 ```bash
 cd backend
 npx prisma migrate deploy
 npx prisma db seed
 ```
 
-4. Start development servers:
-```bash
-# Terminal 1 - Backend
-cd backend && npm run dev
+4. Start the services in separate terminals:
 
-# Terminal 2 - Frontend
+```bash
+# Terminal 1
+cd backend && npm run dev
+```
+
+```bash
+# Terminal 2
 cd frontend && npm run dev
 ```
 
-5. Open http://localhost:3000
+5. Open http://localhost:3000 in your browser.
 
-### Docker Compose
+## Environment variables
 
-```bash
-docker compose up --build
+The backend expects a file named backend/.env with values such as:
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/iter_pharma
+JWT_SECRET=replace-with-a-long-random-secret
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:3000
 ```
 
-This starts PostgreSQL, backend, frontend, Prometheus (port 9090), and Grafana (port 3001).
+The sample file is already available at backend/.env.example.
 
-### Demo Credentials
+## Demo credentials
 
 | Role | Email | Password |
-|------|-------|----------|
+| --- | --- | --- |
 | Representative | rep@iter.com | password123 |
 | Manager | manager@iter.com | password123 |
 | Admin | admin@iter.com | password123 |
 
-## Deployment
+## Deployment options
 
 ### Kubernetes
+
 ```bash
 kubectl apply -f k8s/platform.yaml
 ```
 
 ### Terraform
+
 ```bash
 cd terraform
 terraform init
@@ -174,18 +148,23 @@ terraform plan
 terraform apply
 ```
 
-## Monitoring
+## Monitoring and health checks
 
-- **Prometheus**: http://localhost:9090 — Scrapes `/metrics` endpoint
-- **Grafana**: http://localhost:3001 — Pre-configured dashboard (admin/admin)
-- **Health Check**: GET `/health` returns API status
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3001
+- Health endpoint: GET /health
+- Metrics endpoint: GET /metrics
 
-## Security Notes
+## Security notes
 
-Production deployments should use:
-- Managed identity provider (Cognito/SSO)
-- AWS Secrets Manager for credentials
-- KMS envelope encryption for consent documents
-- HTTPS with WAF
-- Secret rotation policies
-- Independent compliance validation package
+For production deployments, use:
+
+- strong secrets and rotation policies
+- HTTPS and a WAF in front of the application
+- managed identity or SSO where possible
+- encrypted storage for sensitive operational data
+- regular dependency and vulnerability review
+
+## License
+
+This project is intended as a demonstration and platform prototype. Adapt and extend it for your own environment and compliance needs.
