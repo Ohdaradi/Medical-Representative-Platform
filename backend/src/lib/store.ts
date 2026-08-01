@@ -143,8 +143,7 @@ export const getTerritories = async () => prisma.territory.findMany({ orderBy: {
 export const createTerritory = async (input: Partial<TerritoryRecord>) => prisma.territory.create({
   data: {
     name: input.name || 'Unnamed Territory',
-    region: input.region || 'Unknown',
-    repCount: Number(input.repCount || 0)
+    region: input.region || 'Unknown'
   }
 });
 
