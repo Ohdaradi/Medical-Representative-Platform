@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  fullName  String?
+  email     String   @unique
+  password  String
+  role      String   @default("rep")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  visits    Visit[]          @relation("RepVisits")
+  scheduledVisits Visit[]  @relation("ScheduledVisits")
+  orders    Order[]
+  territoryAssignments TerritoryAssignment[]
+}
+
+model Doctor {
+  id           Int      @id @default(autoincrement())
+  name         String
+  city         String?
+  specialty    String?
+  hospital     String?
+  phone        String?
+  email        String?
+  territory    String?
+  latitude     Float?
+  longitude    Float?
+  geoRadiusMeters Int @default(250)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  visits       Visit[]
+  orders       Order[]
+  samples      Sample[]
+}
+
+model Visit {
+  id                  Int       @id @default(autoincrement())
+  doctorId            Int
+  repId               Int
+  scheduledById       Int?
+  isManagerScheduled  Boolean   @default(false)
+  scheduledTime       DateTime?
+  checkInAt           DateTime?
+  checkOutAt          DateTime?
+  checkInLat          Float?
+  checkInLng          Float?
+  checkOutLat         Float?
+  checkOutLng         Float?
+  visitDate           DateTime  @default(now())
+  productsDiscussed   String?
+  doctorFeedback      String?
+  consentVersion      String?
+  consentCapturedAt   DateTime?
+  geoVerified         Boolean   @default(false)
+  notes               String?
+  outcome             String?
+  status              String    @default("planned")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  doctor      Doctor  @relation(fields: [doctorId], references: [id])
+  rep         User    @relation("RepVisits", fields: [repId], references: [id])
+  scheduledBy User?   @relation("ScheduledVisits", fields: [scheduledById], references: [id])
+}
+
+model Product {
+  id           Int      @id @default(autoincrement())
+  name         String
+  category     String?
+  imageUrl     String?
+  unitPrice    Float?
+  stock        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+  samples      Sample[]
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  doctorId     Int
+  repId        Int
+  productId    Int
+  quantity     Int
+  status       String   @default("pending")
+  cancelReason String?
+  cancelledAt  DateTime?
+  signatureName String?
+  signedAt      DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  rep     User    @relation(fields: [repId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Sample {
+  id             Int       @id @default(autoincrement())
+  productId      Int
+  doctorId       Int?
+  issuedByRepId  Int?
+  quantity       Int
+  issuedTo       String?
+  remarks        String?
+  batchNumber    String?
+  expiryDate     DateTime?
+  issuedAt       DateTime  @default(now())
+  status         String    @default("issued")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  doctor  Doctor? @relation(fields: [doctorId], references: [id])
+}
+
+model Territory {
+  id              Int      @id @default(autoincrement())
+  name            String
+  region          String
+  description     String?
+  assignedToEmail String?
+  coverageTarget  Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  assignments     TerritoryAssignment[]
+}
+
+model TerritoryAssignment {
+  id          Int      @id @default(autoincrement())
+  territoryId Int
+  userId      Int
+  assignedAt  DateTime @default(now())
+
+  territory Territory @relation(fields: [territoryId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([territoryId, userId])
+}
+
+model NotificationTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  subject   String
+  body      String
+  variables String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  details   String
+  userEmail String
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  channel   String
+  recipient String
+  subject   String
+  body      String
+  status    String   @default("queued")
+  createdAt DateTime @default(now())
+}
+
+model RegistrationRequest {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  fullName  String?
+  password  String
+  role      String   @default("rep")
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

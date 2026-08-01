@@ -1,0 +1,45 @@
+{
+  "dashboard": {
+    "title": "ITER Pharma API Metrics",
+    "panels": [
+      {
+        "title": "HTTP Request Duration (avg)",
+        "type": "graph",
+        "targets": [{ "expr": "rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 }
+      },
+      {
+        "title": "Process Memory (MB)",
+        "type": "graph",
+        "targets": [{ "expr": "process_resident_memory_bytes / 1024 / 1024" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
+      },
+      {
+        "title": "Active Connections",
+        "type": "stat",
+        "targets": [{ "expr": "nodejs_active_handles_total" }],
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 }
+      },
+      {
+        "title": "Event Loop Lag (s)",
+        "type": "stat",
+        "targets": [{ "expr": "nodejs_eventloop_lag_seconds" }],
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 }
+      },
+      {
+        "title": "Heap Used (MB)",
+        "type": "gauge",
+        "targets": [{ "expr": "nodejs_heap_size_used_bytes / 1024 / 1024" }],
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 8 }
+      },
+      {
+        "title": "CPU Usage (%)",
+        "type": "gauge",
+        "targets": [{ "expr": "rate(process_cpu_seconds_total[5m]) * 100" }],
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 }
+      }
+    ],
+    "time": { "from": "now-1h", "to": "now" },
+    "refresh": "10s"
+  }
+}
